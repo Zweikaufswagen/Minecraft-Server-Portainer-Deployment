@@ -1,3 +1,21 @@
+## Server vorbereiten
+- Ein Ordner /opt/minecraft-server/ muss vorhanden sein
+- Docker Secrets erstellen
+```bash
+# Verzeichnis erstellen
+sudo install -d -m 700 -o root -g root /opt/minecraft-server/secrets
+
+# Sicheres zufälliges Passwort generieren (64 Hex-Zeichen)
+sudo sh -c 'umask 077; openssl rand -hex 32 > /opt/minecraft-server/secrets/rcon_password'
+
+# Dateiberechtigungen sicherstellen
+sudo chmod 600 /opt/minecraft-server/secrets/rcon_password
+sudo chown root:root /opt/minecraft-server/secrets/rcon_password
+
+# Berechtigungen kontrollieren
+sudo ls -l /opt/minecraft-server/secrets/rcon_password
+```
+
 ## Minecraft-Befehle ausführen
 Unter Containers → minecraft → Console kannst du eine Shell wie /bin/sh öffnen und darin beispielsweise ausführen:
 ```bash

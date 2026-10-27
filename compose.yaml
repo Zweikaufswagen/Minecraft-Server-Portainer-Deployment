@@ -1,8 +1,12 @@
+x-deploy-revision: &deploy-revision "1"
 services:
   minecraft:
     image: itzg/minecraft-server:java25
     container_name: minecraft
     restart: unless-stopped
+    depends_on:
+      repo-sync:
+        condition: service_completed_successfully
 
     ports:
       - "25565:25565/tcp"
@@ -31,6 +35,10 @@ services:
 
       ENABLE_RCON: "TRUE"
       RCON_PASSWORD_FILE: /run/secrets/rcon_password
+      
+      DEPLOY_REVISION: *deploy-revision
+      COPY_CONFIG_DEST: /data
+      SYNC_SKIP_NEWER_IN_DESTINATION: "false"
 
       SPAWN_PROTECTION: "50"
 
@@ -48,6 +56,7 @@ services:
     volumes:
       - /home/piadmin/minecraft/data:/data
       - /opt/minecraft-server/config:/config:ro
+      - /opt/minecraft-server/plugins:/plugins:ro
 
     secrets:
       - rcon_password
@@ -109,6 +118,38 @@ services:
 
           sleep 30
         done
+
+  repo-sync:
+    image: alpine/git:latest
+    restart: "no"
+
+    environment:
+      REPO_URL: "https://github.com/Zweikaufswagen/Minecraft-Server-Portainer-Deployment.git"
+      REPO_BRANCH: "main"
+      DEPLOY_REVISION: *deploy-revision
+      GIT_TERMINAL_PROMPT: "0"
+
+    volumes:
+      - /opt/minecraft-server/config:/target-config
+      - /opt/minecraft-server/plugins:/target-plugins
+
+    entrypoint: ["/bin/sh", "-ec"]
+
+    command:
+      - |-
+        work=$$(mktemp -d)
+        trap 'rm -rf "$$work"' EXIT
+
+        git clone --depth 1 \
+          --branch "$$REPO_BRANCH" \
+          "$$REPO_URL" \
+          "$$work/repo"
+
+        test -d "$$work/repo/config"
+        test -d "$$work/repo/plugins"
+
+        cp -a "$$work/repo/config/." /target-config/
+        cp -a "$$work/repo/plugins/." /target-plugins/
 
 secrets:
   rcon_password:
