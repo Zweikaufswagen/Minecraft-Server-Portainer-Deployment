@@ -1,0 +1,16 @@
+language: "en"
+time-zone: "Europe/Berlin"
+
+nether:
+  disable: true
+  restriction-date: "2026-11-12 20:00:00"
+  disable-portal-creation: true
+  disable-teleportation: true
+
+end:
+  disable: true
+  restriction-date: "2026-11-26 20:00:00"
+  disable-portal-activation: true
+
+elytra:
+  disable: false

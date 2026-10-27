@@ -22,15 +22,94 @@ services:
       SIMULATION_DISTANCE: "4"
       MAX_PLAYERS: "20"
 
+      # Server darf ohne Spieler nicht pausieren
+      PAUSE_WHEN_EMPTY_SECONDS: "-1"
+
       ONLINE_MODE: "TRUE"
       ENABLE_WHITELIST: "TRUE"
       ENFORCE_WHITELIST: "TRUE"
       EXISTING_WHITELIST_FILE: "SYNCHRONIZE"
-      WHITELIST: "MC_Black_Death"
+      WHITELIST: "MC_Black_Death,${EXTRA_PLAYERS}"
 
       ENABLE_RCON: "TRUE"
+      RCON_PASSWORD: ${RCON_PASSWORD:?RCON_PASSWORD fehlt}
+
+      SPAWN_PROTECTION: "50"
+
+      MODRINTH_PROJECTS: |
+        chunky
+        worldaccessblocker
+        core-teams
+
+      PLUGINS: |
+        https://raw.githubusercontent.com/EvModder/DropHeads/master/DropHeads_v3.10.11.jar
+
+      # Chunk-Generierung automatisch starten
+      RCON_CMDS_STARTUP: |-
+        gamerule players_sleeping_percentage 50
+        
+      #chunky world world
+      #chunky shape square
+      #chunky spawn
+      #chunky radius 10000
+      #chunky start
 
     volumes:
       - /home/piadmin/minecraft/data:/data
+      - /opt/minecraft-server/config:/config:ro
 
     stop_grace_period: 120s
+    
+  border-scheduler:
+    image: itzg/rcon-cli:1.7.7-ubuntu
+    restart: unless-stopped
+
+    depends_on:
+      - minecraft
+
+    environment:
+      RCON_PASSWORD: ${RCON_PASSWORD:?RCON_PASSWORD fehlt}
+
+      START_AT: "2026-11-02T00:00:00+01:00"
+      RELEASE_AT: "2026-11-05T00:00:00+01:00"
+
+      BORDER_X: "0"
+      BORDER_Z: "0"
+
+    entrypoint: ["/bin/sh", "-ec"]
+
+    command: |
+      rcon() {
+        rcon-cli --host minecraft --port 25575 \
+          --password "$$RCON_PASSWORD" "$$@"
+      }
+
+      start=$$(date -d "$$START_AT" +%s)
+      release=$$(date -d "$$RELEASE_AT" +%s)
+      last=""
+
+      while true; do
+        now=$$(date +%s)
+
+        if [ "$$now" -lt "$$start" ]; then
+          size=20000
+        elif [ "$$now" -lt "$$release" ]; then
+          size=6000
+        else
+          size=20000
+        fi
+
+        if rcon list >/dev/null 2>&1; then
+          if [ "$$last" != "$$size" ]; then
+            if rcon "execute in minecraft:overworld run worldborder center $$BORDER_X $$BORDER_Z" &&
+               rcon "execute in minecraft:overworld run worldborder set $$size"; then
+              echo "Worldborder set: $$size"
+              last="$$size"
+            fi
+          fi
+        else
+          last=""
+        fi
+
+        sleep 30
+      done

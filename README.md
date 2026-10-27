@@ -19,3 +19,19 @@ scp -i "$HOME\.ssh\id_ed25519_raspi" `
   "C:\Pfad\zum\plugin.jar" `
   piadmin@home-pi.local:/home/piadmin/minecraft/data/plugins/
 ```
+
+## Timing
+- you can set a specific date to aktivate the nether and end [WorldAccessBlocker config](./config/plugins/WorldAccessBlocker/config.yml)
+- you can set the Date when the Boarder gets expandet to 20000 blocks [compose.yaml](./compose.yaml)
+
+## pre-chunking
+- Fortschritt abfargen: `/chunky progress`
+
+## Teams verwalten
+```
+/team create Rot
+/team create Blau
+/team create Gruen
+/team join Rot
+/teamadmin
+```
