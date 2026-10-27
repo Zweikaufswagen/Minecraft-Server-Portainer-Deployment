@@ -129,8 +129,9 @@ services:
           sleep 30
         done
 
-    repo-sync:
+  repo-sync:
     image: alpine/git:latest
+    user: "0:0"
     restart: "no"
 
     environment:
@@ -148,33 +149,71 @@ services:
 
     command:
       - |-
+        apk add --no-cache yq-go
+
         work=$$(mktemp -d)
-        trap 'rm -rf "$$work"' EXIT
+        tmp=""
+        trap 'rm -rf "$$work"; if [ -n "$$tmp" ]; then rm -f "$$tmp"; fi' EXIT
 
         git clone --depth 1 \
           --branch "$$REPO_BRANCH" \
           "$$REPO_URL" \
           "$$work/repo"
 
-        # Prüfen, ob alle benötigten Quellen vorhanden sind.
+        override="$$work/repo/data/plugins/Geyser-Spigot/config.yml"
+        target="/target-data/plugins/Geyser-Spigot/config.yml"
+
+        # Quellen prüfen, bevor Dateien verändert werden.
         test -d "$$work/repo/config"
         test -d "$$work/repo/plugins"
-        test -f "$$work/repo/data/plugins/Geyser-Spigot/config.yml"
+        test -s "$$override"
+        yq eval -e 'tag == "!!map"' "$$override" >/dev/null
 
-        # Bisherige Konfigurationen und Plugins kopieren.
+        # Die Konfigurationsversion verwaltet Geyser selbst.
+        if yq eval -e 'has("config-version")' "$$override" >/dev/null; then
+          echo "FEHLER: config-version aus der Override-Datei entfernen." >&2
+          exit 1
+        fi
+
+        # Bisherige Synchronisierung beibehalten.
         cp -a "$$work/repo/config/." /target-config/
         cp -a "$$work/repo/plugins/." /target-plugins/
 
-        # Nur die Geyser-Konfiguration in den Minecraft-Datenordner kopieren.
         mkdir -p /target-data/plugins/Geyser-Spigot
-        cp "$$work/repo/data/plugins/Geyser-Spigot/config.yml" \
-          /target-data/plugins/Geyser-Spigot/config.yml
+        tmp=$$(mktemp /target-data/plugins/Geyser-Spigot/.config.yml.XXXXXX)
 
-        # Besitzrechte für deinen Minecraft-Nutzer (UID/GID 1000:1000).
+        if [ -f "$$target" ]; then
+          # Vorhandene Werte erhalten; Repo-Werte haben Vorrang.
+          yq eval -e 'tag == "!!map"' "$$target" >/dev/null
+
+          yq eval-all \
+            'select(fileIndex == 0) * select(fileIndex == 1)' \
+            "$$target" "$$override" > "$$tmp"
+        else
+          # Erster Start: Geyser ergänzt die übrigen Standardwerte.
+          cp "$$override" "$$tmp"
+        fi
+
+        # Ergebnis prüfen.
+        yq eval -e 'tag == "!!map"' "$$tmp" >/dev/null
+
+        # Eine Sicherung des Standes vor diesem Lauf behalten.
+        if [ -f "$$target" ]; then
+          cp -p "$$target" "$$target.before-repo-sync"
+        fi
+
+        # Rechte passend zu deinem Minecraft-Nutzer setzen.
         chown 1000:1000 \
           /target-data/plugins \
           /target-data/plugins/Geyser-Spigot \
-          /target-data/plugins/Geyser-Spigot/config.yml
+          "$$tmp"
+        chmod 0644 "$$tmp"
+
+        # Erst die fertig erzeugte Datei einsetzen.
+        mv -f "$$tmp" "$$target"
+        tmp=""
+
+        echo "Geyser-Konfiguration erfolgreich zusammengeführt."
 
 secrets:
   rcon_password:
