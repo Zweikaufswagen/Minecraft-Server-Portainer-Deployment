@@ -1,4 +1,4 @@
-x-deploy-revision: &deploy-revision "1"
+x-deploy-revision: &deploy-revision "2"
 services:
   minecraft:
     image: itzg/minecraft-server:java25
@@ -9,7 +9,9 @@ services:
         condition: service_completed_successfully
 
     ports:
-      - "25565:25565/tcp"
+      - "25565:25565/tcp"   # Java
+      - "19132:19132/tcp"   # Bedrock Signaling
+      - "19132:19132/udp"   # Bedrock Gameplay
 
     environment:
       EULA: "TRUE"
@@ -49,10 +51,13 @@ services:
 
       PLUGINS: |
         https://raw.githubusercontent.com/EvModder/DropHeads/master/DropHeads_v3.10.11.jar
+        https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot
+        https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot
 
       RCON_CMDS_STARTUP: |-
         gamerule players_sleeping_percentage 50
-        scoreboard objectives setdisplay sidebar hh_unique
+        scoreboard objectives setdisplay sidebar hh_hunter
+        scoreboard objectives add deaths deathCount
         scoreboard objectives setdisplay list deaths
 
       RCON_CMDS_ON_CONNECT: |-
@@ -124,7 +129,7 @@ services:
           sleep 30
         done
 
-  repo-sync:
+    repo-sync:
     image: alpine/git:latest
     restart: "no"
 
@@ -137,6 +142,7 @@ services:
     volumes:
       - /opt/minecraft-server/config:/target-config
       - /opt/minecraft-server/plugins:/target-plugins
+      - /home/piadmin/minecraft/data:/target-data
 
     entrypoint: ["/bin/sh", "-ec"]
 
@@ -150,11 +156,25 @@ services:
           "$$REPO_URL" \
           "$$work/repo"
 
+        # Prüfen, ob alle benötigten Quellen vorhanden sind.
         test -d "$$work/repo/config"
         test -d "$$work/repo/plugins"
+        test -f "$$work/repo/data/plugins/Geyser-Spigot/config.yml"
 
+        # Bisherige Konfigurationen und Plugins kopieren.
         cp -a "$$work/repo/config/." /target-config/
         cp -a "$$work/repo/plugins/." /target-plugins/
+
+        # Nur die Geyser-Konfiguration in den Minecraft-Datenordner kopieren.
+        mkdir -p /target-data/plugins/Geyser-Spigot
+        cp "$$work/repo/data/plugins/Geyser-Spigot/config.yml" \
+          /target-data/plugins/Geyser-Spigot/config.yml
+
+        # Besitzrechte für deinen Minecraft-Nutzer (UID/GID 1000:1000).
+        chown 1000:1000 \
+          /target-data/plugins \
+          /target-data/plugins/Geyser-Spigot \
+          /target-data/plugins/Geyser-Spigot/config.yml
 
 secrets:
   rcon_password:

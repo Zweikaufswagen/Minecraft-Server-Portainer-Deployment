@@ -63,3 +63,9 @@ rcon-cli --host 127.0.0.1 \
 /team join Rot
 /teamadmin
 ```
+
+## Crossplay 
+- für Badrock Signaling und Gameplay braucht es Protfreigaben oder Tunneling da Playstation nicht einfach Talescale verwenden kann: `19132/tcp`, `19132/udp`
+```
+/fwhitelist add XboxGamertag
+```
