@@ -35,7 +35,7 @@ services:
 
       ENABLE_RCON: "TRUE"
       RCON_PASSWORD_FILE: /run/secrets/rcon_password
-      
+
       DEPLOY_REVISION: *deploy-revision
       COPY_CONFIG_DEST: /data
       SYNC_SKIP_NEWER_IN_DESTINATION: "false"
@@ -52,6 +52,11 @@ services:
 
       RCON_CMDS_STARTUP: |-
         gamerule players_sleeping_percentage 50
+        scoreboard objectives setdisplay sidebar hh_unique
+        scoreboard objectives setdisplay list deaths
+
+      RCON_CMDS_ON_CONNECT: |-
+        scoreboard players add @a deaths 0
 
     volumes:
       - /home/piadmin/minecraft/data:/data
