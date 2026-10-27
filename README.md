@@ -26,18 +26,6 @@ rcon-cli --host 127.0.0.1 \
   "whitelist add WeitererSpieler"
 ```
 
-## Plugins installieren
-Die Plugins liegen weiterhin auf dem Raspberry Pi unter:
-
-/home/piadmin/minecraft/data/plugins
-
-Am einfachsten überträgst du neue .jar-Dateien mit SFTP, beispielsweise über WinSCP oder den scp-Befehl auf Windows:
-```bash
-scp -i "$HOME\.ssh\id_ed25519_raspi" `
-  "C:\Pfad\zum\plugin.jar" `
-  piadmin@home-pi.local:/home/piadmin/minecraft/data/plugins/
-```
-
 ## Timing
 - you can set a specific date to aktivate the nether and end [WorldAccessBlocker config](./config/plugins/WorldAccessBlocker/config.yml)
 - you can set the Date when the Boarder gets expandet to 20000 blocks [compose.yaml](./compose.yaml)
