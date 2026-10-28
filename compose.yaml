@@ -43,6 +43,7 @@ services:
       SYNC_SKIP_NEWER_IN_DESTINATION: "false"
 
       SPAWN_PROTECTION: "50"
+      DIFFICULTY: "hard"
 
       MODRINTH_PROJECTS: |
         chunky
