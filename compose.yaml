@@ -1,4 +1,3 @@
-x-deploy-revision: &deploy-revision "3"
 services:
   minecraft:
     image: itzg/minecraft-server:java25
@@ -38,7 +37,6 @@ services:
       ENABLE_RCON: "TRUE"
       RCON_PASSWORD_FILE: /run/secrets/rcon_password
 
-      DEPLOY_REVISION: *deploy-revision
       COPY_CONFIG_DEST: /data
       SYNC_SKIP_NEWER_IN_DESTINATION: "false"
 
@@ -48,6 +46,7 @@ services:
         chunky
         worldaccessblocker
         core-teams
+        grimac
 
       PLUGINS: |
         https://raw.githubusercontent.com/EvModder/DropHeads/master/DropHeads_v3.10.11.jar
@@ -66,7 +65,6 @@ services:
     volumes:
       - /home/piadmin/minecraft/data:/data
       - /opt/minecraft-server/config:/config:ro
-      - /opt/minecraft-server/plugins:/plugins:ro
 
     secrets:
       - rcon_password
@@ -137,12 +135,10 @@ services:
     environment:
       REPO_URL: "https://github.com/Zweikaufswagen/Minecraft-Server-Portainer-Deployment.git"
       REPO_BRANCH: "main"
-      DEPLOY_REVISION: *deploy-revision
       GIT_TERMINAL_PROMPT: "0"
 
     volumes:
       - /opt/minecraft-server/config:/target-config
-      - /opt/minecraft-server/plugins:/target-plugins
       - /home/piadmin/minecraft/data:/target-data
 
     entrypoint: ["/bin/sh", "-ec"]
@@ -165,7 +161,6 @@ services:
 
         # Quellen prüfen, bevor Dateien verändert werden.
         test -d "$$work/repo/config"
-        test -d "$$work/repo/plugins"
         test -s "$$override"
         yq eval -e 'tag == "!!map"' "$$override" >/dev/null
 
@@ -177,7 +172,6 @@ services:
 
         # Bisherige Synchronisierung beibehalten.
         cp -a "$$work/repo/config/." /target-config/
-        cp -a "$$work/repo/plugins/." /target-plugins/
 
         mkdir -p /target-data/plugins/Geyser-Spigot
         tmp=$$(mktemp /target-data/plugins/Geyser-Spigot/.config.yml.XXXXXX)

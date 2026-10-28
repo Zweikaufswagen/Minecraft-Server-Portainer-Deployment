@@ -1,3 +1,62 @@
+## Paper-Konfiguration aus dem Repo
+
+`config/config/paper-world-defaults.yml` wird beim Deployment durch `repo-sync`
+nach `/opt/minecraft-server/config/config/paper-world-defaults.yml` kopiert.
+Beim Minecraft-Start übernimmt das Image sie nach `/data/config/paper-world-defaults.yml`.
+Der doppelte `config/`-Pfad im Repo ist beabsichtigt: `COPY_CONFIG_DEST: /data`
+bildet den Inhalt des äußeren `config/`-Ordners auf das Serververzeichnis ab.
+
+Repo-Werte überschreiben dabei die bestehende Datei. Einstellungen in den
+weltbezogenen `paper-world.yml`-Dateien haben weiterhin Vorrang vor diesen Defaults.
+
+## Plugins aus dem Repo
+
+Plugin-JARs und ihre Konfigurationen liegen gemeinsam unter `config/plugins/`.
+Beispielsweise wird `config/plugins/HeadHunter-1.2.0.jar` durch `repo-sync` nach
+`/opt/minecraft-server/config/plugins/HeadHunter-1.2.0.jar` kopiert und beim
+Minecraft-Start nach `/data/plugins/HeadHunter-1.2.0.jar` übernommen.
+Geyser-Erweiterungen liegen unter `config/plugins/Geyser-Spigot/extensions/`.
+Ein separater Repo-Ordner `plugins/` und dessen Bind-Mounts werden nicht benötigt.
+
+Nach dem ersten Deployment dieser Umstellung kann die alte Quellkopie auf dem Pi
+entfernt werden. Der folgende Befehl prüft zuerst, dass die neue Quellkopie existiert:
+
+```bash
+sudo test -s /opt/minecraft-server/config/plugins/HeadHunter-1.2.0.jar &&
+  sudo rm -- /opt/minecraft-server/plugins/HeadHunter-1.2.0.jar
+```
+
+Die aktive Datei unter `/home/piadmin/minecraft/data/plugins/` bleibt erhalten.
+`repo-sync` kopiert Dateien, entfernt aber keine aus dem Repo gelöschten Dateien
+auf dem Host. Bei einem späteren Wechsel des JAR-Dateinamens müssen veraltete
+Versionen auch aus den Quell- und Laufzeitordnern auf dem Host entfernt werden.
+
+## Änderungen mit Portainer deployen
+
+Nach Änderungen die betroffenen Dateien committen und pushen. Ein manueller
+Deploy-Zähler in `compose.yaml` ist nicht erforderlich.
+
+In Portainer den Stack öffnen und **Pull and redeploy** mit
+**Re-pull image and redeploy** verwenden. Das vollständige Redeployment startet
+`repo-sync` erneut und erstellt den Minecraft-Container neu. Minecraft wartet auf
+den erfolgreichen Sync und übernimmt beim Start die Konfigurationen, Plugins,
+Geyser-Erweiterungen und Ressourcenpakete aus den eingebundenen Quellordnern.
+Die Option kann auch neuere Container-Images für die konfigurierten Tags laden.
+
+Für automatische GitOps-Deployments **Force redeployment** aktivieren; ein
+Webhook eignet sich, um das Deployment gezielt nach einem Push auszulösen.
+Bei Polling erzwingt diese Option ein Deployment in jedem Intervall, auch ohne
+Git-Änderungen, und kann damit unnötige Serverneustarts verursachen.
+
+Ein einfacher Container-Neustart oder ein normales Compose-Update ohne
+Neuerstellung reicht für reine Repo-Dateiänderungen nicht zuverlässig aus.
+`repo-sync` bleibt ein einmaliger Vorbereitungsschritt; es gibt keinen laufenden
+Git-Abgleich. Der Sync verwendet den in `REPO_BRANCH` angegebenen Branch (`main`).
+
+Portainer-Dokumentation:
+[vollständiges Redeployment](https://docs.portainer.io/faqs/troubleshooting/stacks-deployments-and-updates/empty-relative-bind-mounts)
+und [GitOps-Optionen](https://docs.portainer.io/user/docker/stacks/add).
+
 ## Server vorbereiten
 - Ein Ordner /opt/minecraft-server/ muss vorhanden sein
 - Docker Secrets erstellen
@@ -66,6 +125,9 @@ rcon-cli --host 127.0.0.1 \
 
 ## Crossplay 
 - für Badrock Signaling und Gameplay braucht es Protfreigaben oder Tunneling da Playstation nicht einfach Talescale verwenden kann: `19132/tcp`, `19132/udp`
+- Bedrock spieler müssen erst einmal gejoint sein bevor sie gewhitelisted werden können, also:
 ```
+/whitelist off
 /fwhitelist add XboxGamertag
+/whitelist on
 ```
