@@ -207,7 +207,7 @@ rcon-cli --host 127.0.0.1 \
 
 ## pre-chunking
 - add into compose:
-´´´yaml
+```yaml
   enviorment:
     RCON_CMDS_STARTUP: |-
       bluemap stop
@@ -216,7 +216,7 @@ rcon-cli --host 127.0.0.1 \
       chunky spawn
       chunky radius 10000
       chunky start
-´´´
+```
 - Fortschritt abfargen: `/chunky progress`
 
 ## Teams verwalten
