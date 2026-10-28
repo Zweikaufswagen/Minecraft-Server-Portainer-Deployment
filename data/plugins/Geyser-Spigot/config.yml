@@ -6,3 +6,6 @@ bedrock:
 
 java:
   auth-type: floodgate
+
+gameplay:
+  force-resource-packs: true

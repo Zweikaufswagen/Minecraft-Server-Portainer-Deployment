@@ -1,4 +1,4 @@
-x-deploy-revision: &deploy-revision "2"
+x-deploy-revision: &deploy-revision "3"
 services:
   minecraft:
     image: itzg/minecraft-server:java25
