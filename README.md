@@ -31,6 +31,110 @@ Die aktive Datei unter `/home/piadmin/minecraft/data/plugins/` bleibt erhalten.
 auf dem Host. Bei einem späteren Wechsel des JAR-Dateinamens müssen veraltete
 Versionen auch aus den Quell- und Laufzeitordnern auf dem Host entfernt werden.
 
+## EssentialsX
+
+Das EssentialsX-Hauptplugin wird über `PLUGINS` in `compose.yaml` als offizieller
+Release `2.22.0` heruntergeladen. Die Version ist festgelegt und wird durch Ändern
+der Download-URL aktualisiert. Weitere EssentialsX-Module sind nicht enthalten.
+
+Modrinth weist aktuell keine zu Minecraft `26.3` passende EssentialsX-Version aus.
+Der Direktdownload umgeht nur diesen Downloadfilter; er bestätigt keine
+Laufzeitkompatibilität. Nach dem Deployment die Container-Logs auf EssentialsX-
+Ladefehler prüfen und als Operator `/version Essentials` ausführen.
+Die generierte Konfiguration liegt auf dem Pi unter
+`/home/piadmin/minecraft/data/plugins/Essentials/config.yml`.
+
+Quelle: [EssentialsX 2.22.0 und unterstützte Serverversionen](https://github.com/EssentialsX/Essentials/releases/tag/2.22.0).
+
+## BlueMap
+
+BlueMap wird über `MODRINTH_PROJECTS` in Compose für die konfigurierte
+Minecraft-/Paper-Version heruntergeladen. Der integrierte Webserver ist über
+TCP-Port `8100` veröffentlicht. Nach Commit, Push und vollständigem Redeployment
+ist die Karte unter `http://<IP-des-Pi>:8100/` erreichbar (HTTP, nicht HTTPS).
+Im Heimnetz ist keine Router-Portweiterleitung erforderlich. Über Tailscale kann
+die Tailscale-IP des Pi verwendet werden, sofern die Zugriffsregeln dies erlauben.
+Für öffentlichen Zugriff wären eine passende Freigabe oder ein Reverse-Proxy
+mit HTTPS nötig. Die Minecraft-Whitelist schützt die Webkarte nicht: BlueMap hat
+keine eigene Anmeldung, und Karten sowie ggf. Spielerpositionen sind für alle
+sichtbar, die den Web-Port erreichen können.
+
+Die Repo-Konfiguration liegt unter `config/plugins/BlueMap/` und wird beim Start
+nach `/data/plugins/BlueMap/` kopiert:
+
+- `core.conf`: `accept-download: true` erlaubt den notwendigen Download der
+  Minecraft-Client-Ressourcen von Mojang (Java-Edition-Lizenz und EULA vorausgesetzt).
+  `render-thread-count: 1` begrenzt die Renderarbeit auf einen Thread.
+- `plugin.conf`: `player-render-limit: 1` pausiert das Rendern, sobald mindestens
+  ein Spieler online ist. Die bereits gerenderte Karte bleibt erreichbar.
+  Mit `-1` wird auch während des Spielens gerendert.
+- `webserver.conf`: aktiviert den Webserver auf Port `8100` im Container.
+
+Weitere Einstellungen sind für den Grundbetrieb nicht erforderlich. BlueMap
+erstellt beim ersten Start die übrigen Standardkonfigurationen und Karten für
+die gefundenen Welten. Es liest gespeicherte Welt-Chunks und erzeugt daraus
+3D-Kartendaten für den Browser; Spieler brauchen keinen zusätzlichen Mod.
+Änderungen erscheinen nach dem Speichern der Welt und dem nächsten Renderlauf.
+Das erste Rendern großer, etwa mit Chunky vorgenerierter Welten kann auf dem Pi
+lange dauern und viel Speicherplatz belegen. Chunky und BlueMap möglichst nicht
+gleichzeitig große Flächen bearbeiten lassen; bei Bedarf Kartenflächen begrenzen.
+
+Status und Wartung als Operator:
+
+```text
+/bluemap
+/bluemap maps
+/bluemap stop
+/bluemap start
+/bluemap reload
+```
+
+`stop` und `start` pausieren bzw. erlauben das Rendern; das Spielerlimit gilt
+weiterhin. Die Kartendaten bleiben unter `/home/piadmin/minecraft/data/bluemap/`
+auf dem Pi persistent. Die automatisch erstellten Kartenkonfigurationen liegen
+unter `/home/piadmin/minecraft/data/plugins/BlueMap/maps/`.
+Änderungen an den drei vom Repo verwalteten Dateien im Repo vornehmen und neu
+deployen, da lokale Änderungen an diesen Dateien beim Start überschrieben werden.
+Bei BlueMap-Updates die Release-Hinweise beachten: Manche Updates erfordern das
+Erneuern der Webapp-Dateien zusätzlich zum automatischen JAR-Update.
+
+Dokumentation: [Installation](https://bluemap.bluecolored.de/wiki/getting-started/Installation.html),
+[Konfiguration und Performance](https://bluemap.bluecolored.de/wiki/getting-started/Configuration.html),
+[Befehle](https://bluemap.bluecolored.de/wiki/getting-started/Commands.html).
+
+## Simple Voice Chat
+
+`simple-voice-chat` wird über `MODRINTH_PROJECTS` für Paper installiert.
+Compose veröffentlicht den separaten Voice-Port `24454/udp`.
+`config/plugins/voicechat/voicechat-server.properties` wird beim Start nach
+`/data/plugins/voicechat/voicechat-server.properties` kopiert. Konfiguriert sind
+48 Blöcke Sprachreichweite, 24 Blöcke Flüstern, Gruppen und optionaler Voicechat.
+Gruppen erlauben Gespräche unabhängig von der Entfernung.
+
+Nach Commit, Push und vollständigem Redeployment:
+
+1. Java-Spieler installieren Simple Voice Chat für ihre Minecraft-Version und
+   ihren Client-Modloader (z. B. Fabric). Möglichst dieselbe Voicechat-Version wie
+   auf dem Server verwenden. Im Spiel mit `V` Mikrofon, Ausgabe und Sprechtaste
+   konfigurieren. Das Serverplugin allein reicht nicht für Sprachübertragung.
+2. Bei direktem Internetzugriff UDP-Port `24454` im Router zum Pi weiterleiten und
+   in einer vorhandenen Firewall erlauben. Im LAN oder über Tailscale ist keine
+   Router-Weiterleitung nötig; UDP muss zwischen Spielern und Pi erreichbar sein.
+   Ein reiner Minecraft-TCP-Tunnel transportiert den Voicechat nicht. Bei einem
+   separaten UDP-Tunnel dessen öffentliche Adresse und Port als `voice_host`
+   eintragen, ansonsten den Wert leer lassen.
+3. Als Operator mit `/voicechat test <Spielername>` die Verbindung eines Spielers
+   mit installiertem Client-Mod prüfen. Gewöhnliche TCP-Porttester helfen hier nicht.
+
+Bedrock-/Geyser-Spieler können Simple Voice Chat nicht direkt nutzen. Durch
+`force_voice_chat=false` können sie und Java-Spieler ohne Mod weiterhin mitspielen.
+Änderungen an der Properties-Datei im Repo vornehmen und neu deployen.
+
+Dokumentation: [Installation](https://modrepo.de/minecraft/voicechat/wiki/installation),
+[Server-Konfiguration](https://modrepo.de/minecraft/voicechat/wiki/server_config),
+[Verbindungstest](https://modrepo.de/minecraft/voicechat/wiki/server_setup)
+und [Bedrock-/Client-Hinweise](https://modrepo.de/minecraft/voicechat/faq).
+
 ## Änderungen mit Portainer deployen
 
 Nach Änderungen die betroffenen Dateien committen und pushen. Ein manueller
@@ -106,6 +210,7 @@ rcon-cli --host 127.0.0.1 \
 ´´´yaml
   enviorment:
     RCON_CMDS_STARTUP: |-
+      bluemap stop
       chunky world world
       chunky shape square
       chunky spawn

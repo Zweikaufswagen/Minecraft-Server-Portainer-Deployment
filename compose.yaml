@@ -11,6 +11,8 @@ services:
       - "25565:25565/tcp"   # Java
       - "19132:19132/tcp"   # Bedrock Signaling
       - "19132:19132/udp"   # Bedrock Gameplay
+      - "8100:8100/tcp"     # BlueMap-Webkarte
+      - "24454:24454/udp"   # Simple Voice Chat
 
     environment:
       EULA: "TRUE"
@@ -47,8 +49,12 @@ services:
         worldaccessblocker
         core-teams
         grimac
+        bluemap
+        simple-voice-chat
 
+      # EssentialsX ist auf 2.22.0 fixiert; Unterstützung für Paper 26.3 ist unbestätigt.
       PLUGINS: |
+        https://github.com/EssentialsX/Essentials/releases/download/2.22.0/EssentialsX-2.22.0.jar
         https://raw.githubusercontent.com/EvModder/DropHeads/master/DropHeads_v3.10.11.jar
         https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot
         https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot
