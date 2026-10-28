@@ -22,7 +22,7 @@ services:
       TZ: "Europe/Berlin"
 
       INIT_MEMORY: "512M"
-      MAX_MEMORY: "5G"
+      MAX_MEMORY: "6G"
 
       VIEW_DISTANCE: "5"
       SIMULATION_DISTANCE: "4"
