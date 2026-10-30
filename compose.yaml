@@ -62,6 +62,8 @@ services:
 
       RCON_CMDS_STARTUP: |-
         gamerule players_sleeping_percentage 50
+        bluemap freeze world_the_nether
+        bluemap freeze world_the_end
         scoreboard objectives setdisplay sidebar hh_hunter
         scoreboard objectives add deaths deathCount
         scoreboard objectives setdisplay list deaths
