@@ -201,6 +201,16 @@ rcon-cli --host 127.0.0.1 \
   "whitelist add WeitererSpieler"
 ```
 
+## Wartungsmodus
+
+```bash
+# Wartungsmodus aktivieren
+rcon-cli --host 127.0.0.1 "maintenance on"
+
+# Wartungsmodus deaktivieren
+rcon-cli --host 127.0.0.1 "maintenance off"
+```
+
 ## Timing
 - you can set a specific date to aktivate the nether and end [WorldAccessBlocker config](./config/plugins/WorldAccessBlocker/config.yml)
 - you can set the Date when the Boarder gets expandet to 20000 blocks [compose.yaml](./compose.yaml)

@@ -61,6 +61,7 @@ services:
         https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot
 
       RCON_CMDS_STARTUP: |-
+        maintenance on
         gamerule players_sleeping_percentage 50
         bluemap freeze world_the_nether
         bluemap freeze world_the_end
