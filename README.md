@@ -252,5 +252,5 @@ rcon-cli --host 127.0.0.1 "maintenance off"
 
 ## reset death-counter
 ```
-rcon-cli "scoreboard players set * deaths 0"
+/rcon-cli "scoreboard players set * deaths 0"
 ```
