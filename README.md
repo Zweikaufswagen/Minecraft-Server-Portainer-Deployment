@@ -249,3 +249,8 @@ rcon-cli --host 127.0.0.1 "maintenance off"
 /fwhitelist add XboxGamertag
 /whitelist on
 ```
+
+## reset death-counter
+```
+rcon-cli "scoreboard players set * deaths 0"
+```
