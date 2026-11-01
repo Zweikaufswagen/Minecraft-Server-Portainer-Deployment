@@ -52,6 +52,7 @@ services:
         grimac
         bluemap
         simple-voice-chat
+        reversequartz?
 
       # EssentialsX ist auf 2.22.0 fixiert; Unterstützung für Paper 26.3 ist unbestätigt.
       PLUGINS: |
