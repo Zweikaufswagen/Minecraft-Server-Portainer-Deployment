@@ -62,9 +62,12 @@ services:
 
       RCON_CMDS_STARTUP: |-
         maintenance on
+        execute in minecraft:overworld run worldborder set 50
         gamerule players_sleeping_percentage 50
         bluemap freeze world_the_nether
         bluemap freeze world_the_end
+        bluemap stop
+        chunky pause
         scoreboard objectives setdisplay sidebar hh_hunter
         scoreboard objectives add deaths deathCount
         scoreboard objectives setdisplay list deaths
