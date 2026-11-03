@@ -96,7 +96,7 @@ world-settings:
       raiders: 16
       misc: 4
       water: 4
-      villagers: 6
+      villagers: 0
       flying-monsters: 6
       wake-up-inactive:
         animals-max-per-tick: 4

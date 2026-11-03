@@ -1,0 +1,13 @@
+
+anti-xray:
+  enabled: false
+
+entities:
+  hide-entities: true
+  hide-mode: chunk
+
+performance:
+  max-chunks-per-tick: 10
+
+freecam-detection:
+  enabled: false

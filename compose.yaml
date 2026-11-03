@@ -61,8 +61,9 @@ services:
         https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot
 
       RCON_CMDS_STARTUP: |-
+        gamerule mob_griefing true
         maintenance on
-        execute in minecraft:overworld run worldborder set 50
+        execute in minecraft:overworld run worldborder set 6000
         gamerule players_sleeping_percentage 50
         bluemap freeze world_the_nether
         bluemap freeze world_the_end
