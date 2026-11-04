@@ -254,3 +254,8 @@ rcon-cli --host 127.0.0.1 "maintenance off"
 ```
 /rcon-cli "scoreboard players set * deaths 0"
 ```
+
+## Combat Logs
+```bash
+sudo docker logs --since 24h minecraft 2>&1 | grep '\[PVP\]'
+```

@@ -1,0 +1,7 @@
+on damage of player:
+    if attacker is a player:
+        send "[PVP] %now% | %attacker% -> %victim% | Schaden: %damage% | Ort: %location of victim%" to console
+
+    else if attacker is a projectile:
+        if shooter of attacker is a player:
+            send "[PVP] %now% | %shooter of attacker% -> %victim% | Fernkampf | Schaden: %damage% | Ort: %location of victim%" to console
