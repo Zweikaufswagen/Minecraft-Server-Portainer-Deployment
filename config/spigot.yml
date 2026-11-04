@@ -53,9 +53,9 @@ world-settings:
     view-distance: default
     simulation-distance: default
     merge-radius:
-      item: 0.5
-      exp: -1.0
-    mob-spawn-range: 8
+      item: 3.5
+      exp: 4.0
+    mob-spawn-range: 3
     item-despawn-rate: 6000
     arrow-despawn-rate: 1200
     trident-despawn-rate: 1200
@@ -114,18 +114,18 @@ world-settings:
       villagers-work-immunity-after: 100
       villagers-work-immunity-for: 20
       villagers-active-for-panic: true
-      tick-inactive-villagers: true
+      tick-inactive-villagers: false
       ignore-spectators: false
     entity-tracking-range:
-      players: 128
-      animals: 96
-      monsters: 96
-      misc: 96
-      display: 128
+      players: 48
+      animals: 48
+      monsters: 48
+      misc: 32
+      display: 64
       other: 64
     ticks-per:
       hopper-transfer: 8
-      hopper-check: 1
+      hopper-check: 8
     hopper-amount: 1
     hopper-can-load-chunks: false
     dragon-death-sound-radius: 0
