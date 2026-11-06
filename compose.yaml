@@ -63,7 +63,7 @@ services:
       RCON_CMDS_STARTUP: |-
         gamerule mob_griefing true
         maintenance on
-        execute in minecraft:overworld run worldborder set 6000
+        execute in minecraft:overworld run worldborder set 20000
         gamerule players_sleeping_percentage 50
         bluemap freeze world_the_nether
         bluemap freeze world_the_end
