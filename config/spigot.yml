@@ -96,7 +96,7 @@ world-settings:
       raiders: 16
       misc: 4
       water: 4
-      villagers: 0
+      villagers: 32
       flying-monsters: 6
       wake-up-inactive:
         animals-max-per-tick: 4
@@ -114,7 +114,7 @@ world-settings:
       villagers-work-immunity-after: 100
       villagers-work-immunity-for: 20
       villagers-active-for-panic: true
-      tick-inactive-villagers: false
+      tick-inactive-villagers: true
       ignore-spectators: false
     entity-tracking-range:
       players: 48
