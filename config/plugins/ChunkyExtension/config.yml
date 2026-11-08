@@ -1,0 +1,8 @@
+version: 1
+
+settings:
+  players-to-start: 3
+  players-to-pause: 4
+  delay: 10
+  tps-limit: 18
+  tps-check-interval: 5

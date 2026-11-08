@@ -101,7 +101,7 @@ force-safe-teleport-location: false
 
 # Consider water blocks as "safe", therefore allowing players to teleport
 # using commands such as /home or /spawn to a location that is occupied by water blocks.
-is-water-safe: false
+is-water-safe: true
 
 # If a player has any passengers, the teleport will fail. Should their passengers be dismounted before they are teleported?
 # If this is set to true, Essentials will dismount the player's passengers before teleporting.
@@ -109,7 +109,7 @@ is-water-safe: false
 teleport-passenger-dismount: true
 
 # The delay, in seconds, required between /home, /tp, etc.
-teleport-cooldown: 30
+teleport-cooldown: 120
 
 # The delay, in seconds, before a player actually teleports.
 # If the player moves or gets attacked in this timeframe, the teleport is cancelled.
@@ -267,71 +267,46 @@ mute-commands:
 #
 # To enable this feature, ensure 'use-bukkit-permissions' below is set to false.
 player-commands:
+  # Allgemein
   - afk
   - afk.auto
-  - balance
-  - balance.others
-  - balancetop
   - build
-  - chat.color
-  - chat.format
-  - chat.shout
-  - chat.question
-  - clearinventory
-  - compass
-  - depth
-  - delhome
-  - getpos
-  - geoip.show
   - help
   - helpop
-  - ignore
   - info
-  - itemdb
   - list
+  - motd
+  - ping
+  - rules
+  - seen
+
+  # Kommunikation
+  - ignore
   - mail
   - mail.send
   - me
-  - motd
   - msg
-  - msg.color
-  - nick
-  - near
-  - pay
-  - ping
-  - protect
   - r
-  - rules
-  - realname
-  - seen
-  - sell
-  - setxmpp
-  - signs.create.protection
-  - signs.create.trade
-  - signs.break.protection
-  - signs.break.trade
-  - signs.use.balance
-  - signs.use.buy
-  - signs.use.disposal
-  - signs.use.info
-  - signs.use.mail
-  - signs.use.protection
-  - signs.use.sell
-  - signs.use.trade
-  - signs.use.warp
-  - signs.use.weather
-  - spawn
-  - suicide
-  - time
+
+  # Informationen
+  - compass
+  - depth
+  - getpos
+  - itemdb
+
+  # Homes
+  - home
+  - sethome
+  - delhome
+  - renamehome
+
+  # Teleportanfragen
   - tpa
-  - tpaccept
   - tpahere
+  - tpaccept
   - tpdeny
-  - warp
-  - warp.list
-  - world
-  - worth
-  - xmpp
+  - tpacancel
+  - tptoggle
 
 # Use this option to force superperms-based permissions handler regardless of detected installed perms plugin.
 # This is useful if you want superperms-based permissions (with wildcards) for custom permissions plugins.
@@ -790,7 +765,7 @@ update-bed-at-daytime: true
 # Set to true to enable per-world permissions for using homes to teleport between worlds.
 # This applies to the /home command only.
 # Give someone permission to teleport to a world with 'essentials.worlds.<worldname>'.
-world-home-permissions: false
+world-home-permissions: true
 
 # Allow players to have multiple homes.
 # Players need 'essentials.sethome.multiple' before they can have more than 1 home.
@@ -817,7 +792,7 @@ compass-towards-home-perm: false
 
 # If no home is set, would you like to send the player to spawn?
 # If set to false, players will not be teleported when they run /home without first setting a home.
-spawn-if-no-home: true
+spawn-if-no-home: false
 
 # Should players be asked to provide confirmation for homes they attempt to overwrite?
 confirm-home-overwrite: false

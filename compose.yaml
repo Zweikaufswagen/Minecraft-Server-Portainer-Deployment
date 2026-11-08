@@ -61,7 +61,6 @@ services:
         https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot
 
       RCON_CMDS_STARTUP: |-
-        gamerule mob_griefing true
         maintenance on
         execute in minecraft:overworld run worldborder set 20000
         gamerule players_sleeping_percentage 50
@@ -72,6 +71,9 @@ services:
         scoreboard objectives setdisplay sidebar hh_hunter
         scoreboard objectives add deaths deathCount
         scoreboard objectives setdisplay list deaths
+        plugins
+        ce status
+        bluemap
 
       RCON_CMDS_ON_CONNECT: |-
         scoreboard players add @a deaths 0

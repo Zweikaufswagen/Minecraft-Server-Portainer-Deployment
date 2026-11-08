@@ -174,9 +174,6 @@ entities:
         short_grass: 300
         pumpkin: 300
         melon_slice: 300
-        kelp: 300
-        bamboo: 300
-        sugar_cane: 300
         twisting_vines: 300
         weeping_vines: 300
         oak_leaves: 300
@@ -187,7 +184,6 @@ entities:
         dark_oak_leaves: 300
         mangrove_leaves: 300
         cherry_leaves: 300
-        cactus: 300
         diorite: 300
         granite: 300
         andesite: 300

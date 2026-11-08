@@ -32,7 +32,7 @@ spawn-limits:
 chunk-gc:
   period-in-ticks: 600
 ticks-per:
-  monster-spawns: 1
+  monster-spawns: 20
   animal-spawns: 400
   water-spawns: 400
   water-ambient-spawns: 400
